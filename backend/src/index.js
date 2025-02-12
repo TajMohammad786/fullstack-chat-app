@@ -14,7 +14,7 @@ server.use(express.json());
 server.use("/api/auth", authRoutes);
 server.use("/api/messages", messageRoutes);
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log("server is running on PORT:" + PORT);
   connectDB();
 });
