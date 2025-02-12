@@ -10,15 +10,12 @@ dotenv.config();
 const server = express();
 const PORT = process.env.PORT;
 
-server.use(
-  cors({
-    origin:
-      "https://b3f8f773-e70a-444e-b53a-639ec87ca0c9-00-2omyig557gis6.spock.replit.dev",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
-  }),
-);
+server.use(cors({
+  origin: true, 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+}));
 server.use(cookieParser());
 server.use(express.json());
 server.use("/api/auth", authRoutes);
