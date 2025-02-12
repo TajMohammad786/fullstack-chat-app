@@ -11,7 +11,7 @@ const server = express();
 const PORT = process.env.PORT;
 
 server.use(cors({
-  origin: true, // Allow all origins in development
+  origin: true, 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
