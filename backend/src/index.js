@@ -10,12 +10,13 @@ dotenv.config();
 const server = express();
 const PORT = process.env.PORT;
 
-server.use(cors({
-  origin: true, 
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
-}));
+server.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 server.use(cookieParser());
 server.use(express.json());
 server.use("/api/auth", authRoutes);
