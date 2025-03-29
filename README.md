@@ -2,6 +2,8 @@
 # Real-Time Chat Application
 
 A full-stack chat application built with modern web technologies featuring real-time messaging, user authentication, and a responsive UI.
+![image](https://github.com/user-attachments/assets/66f4692c-a0be-427b-bdad-84cb9e933df4)
+
 
 ## Features
 
