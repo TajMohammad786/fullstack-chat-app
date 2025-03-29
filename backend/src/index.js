@@ -5,27 +5,30 @@ import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import messageRoutes from "./routes/message.routes.js";
 import cors from "cors";
+import { app, server } from "./lib/socket.js";
 
-dotenv.config();
-const server = express();
-const PORT = process.env.PORT;
-
-server.use(
+app.use(
   cors({
-    origin:
-      ["https://b3f8f773-e70a-444e-b53a-639ec87ca0c9-00-2omyig557gis6.spock.replit.dev","https://b3f8f773-e70a-444e-b53a-639ec87ca0c9-00-2omyig557gis6.spock.replit.dev:8000"],
+    origin: [
+      "https://b3f8f773-e70a-444e-b53a-639ec87ca0c9-00-2omyig557gis6.spock.replit.dev",
+      "https://b3f8f773-e70a-444e-b53a-639ec87ca0c9-00-2omyig557gis6.spock.replit.dev:8000",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
     exposedHeaders: ["set-cookie"],
   }),
 );
-server.use(cookieParser());
-server.use(express.json());
-server.use("/api/auth", authRoutes);
-server.use("/api/messages", messageRoutes);
+app.use(cookieParser());
+app.use(express.json());
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
 
-server.listen(PORT, "0.0.0.0", () => {
+dotenv.config();
+
+const PORT = process.env.PORT;
+
+server.listen(PORT, () => {
   console.log("server is running on PORT:" + PORT);
   connectDB();
 });

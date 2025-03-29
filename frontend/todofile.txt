@@ -1,0 +1,97 @@
+Steps to Integrate "User is Typing" Feature
+1. Setup Socket.io in Your Express Server
+If you haven’t installed Socket.io, install it first:
+
+bash
+Copy
+npm install socket.io express
+Now, set up your Express.js server with Socket.io:
+
+javascript
+Copy
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  // Listen for "typing" event
+  socket.on("typing", (data) => {
+    socket.broadcast.emit("userTyping", data); // Notify other users
+  });
+
+  // Listen for "stop typing" event
+  socket.on("stopTyping", (data) => {
+    socket.broadcast.emit("userStoppedTyping", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("A user disconnected:", socket.id);
+  });
+});
+
+server.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
+2. Handle Events in Your Frontend
+In your frontend, listen for the typing events and notify the users.
+
+Frontend (JavaScript with Socket.io Client)
+Install the Socket.io client if not already installed:
+
+bash
+Copy
+npm install socket.io-client
+Now, update your frontend (React, Vanilla JS, or any framework):
+
+javascript
+Copy
+const socket = io("http://localhost:3000"); // Connect to the server
+
+const inputField = document.getElementById("messageInput");
+const typingIndicator = document.getElementById("typingIndicator");
+
+let typingTimeout;
+
+// Detect when the user starts typing
+inputField.addEventListener("input", () => {
+  socket.emit("typing", { username: "User1" });
+
+  // Clear the previous timeout
+  clearTimeout(typingTimeout);
+
+  // Stop typing event after 2 seconds of inactivity
+  typingTimeout = setTimeout(() => {
+    socket.emit("stopTyping", { username: "User1" });
+  }, 2000);
+});
+
+// Listen for typing events from other users
+socket.on("userTyping", (data) => {
+  typingIndicator.innerText = `${data.username} is typing...`;
+});
+
+// Listen for stop typing events
+socket.on("userStoppedTyping", () => {
+  typingIndicator.innerText = "";
+});
+How It Works
+When a user types in the input field, the frontend emits a "typing" event to the server.
+The server broadcasts this event to other connected users.
+Other users receive the event and display a "User is typing..." message.
+When the user stops typing for 2 seconds, the "stopTyping" event is emitted.
+The message disappears when the stop event is received.
+Enhancements
+Store the typing users in an array and update the UI accordingly for multiple users.
+Add a debounce mechanism to avoid too many events being emitted.
+Show typing status in group chats for specific users.
+Let me know if you need further modifications! 🚀

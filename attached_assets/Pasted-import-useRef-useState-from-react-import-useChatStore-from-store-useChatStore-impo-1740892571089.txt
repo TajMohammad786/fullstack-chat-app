@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
@@ -8,34 +8,8 @@ const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { sendMessage, selectedUser } = useChatStore();
+  const { sendMessage } = useChatStore();
   const socket = useAuthStore.getState().socket;
-  // const { authUser } = useAuthStore();
-  const [isTyping, setIsTyping] = useState(false);
-  const [isSelfTyping, setSelfTyping] = useState(false);
-
-  useEffect(() => {
-    // Listener for typing events
-    console.log("SelectedUser ", selectedUser._id);
-    socket.on("typing", (data) => {
-      // console.log("typing ", data.userId, " -> selected ", selectedUser._id);
-      if (data.userId == selectedUser._id) setIsTyping(true);
-      else return;
-    });
-
-    // Listener for stop typing events
-    socket.on("stopTyping", (data) => {
-      // console.log("stoptyping ", data);
-      if (data.userId == selectedUser._id) setIsTyping(false);
-      else return;
-    });
-
-    // Cleanup function to remove listeners when component unmounts
-    return () => {
-      socket.off("typing");
-      socket.off("stopTyping");
-    };
-  }, [socket, selectedUser]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -74,22 +48,15 @@ const MessageInput = () => {
       console.error("Failed to send message:", error);
     }
   };
-
   let typingTimeout;
-
   const handleMsgChange = (e) => {
     setText(e.target.value);
-    console.log("input ", selectedUser._id);
-    // socket.emit("typing", { user: authUser._id });
-    if (!isSelfTyping) {
-      setSelfTyping(true);
-      socket.emit("typing", { user: selectedUser._id });
-    }
-
+    socket.emit('typing', {user: req.user._id})
     clearTimeout(typingTimeout);
+
+    // Stop typing event after 2 seconds of inactivity
     typingTimeout = setTimeout(() => {
-      socket.emit("stopTyping", { user: selectedUser._id });
-      setSelfTyping(false);
+      socket.emit("stopTyping", {user: req.user._id});
     }, 2000);
   };
 
@@ -114,11 +81,7 @@ const MessageInput = () => {
           </div>
         </div>
       )}
-      {isTyping && (
-        <div className="mb-2 text-xs text-gray-500">
-          <span>User is typing...</span>
-        </div>
-      )}
+
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
         <div className="flex-1 flex gap-2">
           <input

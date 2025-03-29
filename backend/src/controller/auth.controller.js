@@ -4,8 +4,8 @@ import { generateJWTToken } from "../lib/generateJWTToken.js";
 import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
-    const { email, username, password } = req.body;
-
+    const { email, fullName, password } = req.body;
+    const username = fullName;
     try {
         if (password.length < 6) {
             return res.status(400).json({
@@ -21,7 +21,7 @@ export const signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User({ email, username, password: hashedPassword });
-
+        console.log("new User ", newUser);
         if (newUser) {
             generateJWTToken(newUser._id, res);
             await newUser.save();
@@ -84,7 +84,7 @@ export const updateProfile = async (req, res) => {
             return res.status(400).json({ message: "Invalid Profile Picture" });
         }
         const uploadResponse = await cloudinary.uploader.upload(profilePic);
-        const updatedUser = User.findByIdAndUpdate(
+        const updatedUser = await User.findByIdAndUpdate(
             userId,
             { profilePic: uploadResponse.secure_url },
             { new: true },

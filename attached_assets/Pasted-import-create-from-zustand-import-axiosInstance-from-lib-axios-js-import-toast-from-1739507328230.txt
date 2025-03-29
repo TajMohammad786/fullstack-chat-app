@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 
 const BASE_URL =
   import.meta.env.MODE === "development"
-    ? "https://b3f8f773-e70a-444e-b53a-639ec87ca0c9-00-2omyig557gis6.spock.replit.dev:8000"
+    ? "https://b3f8f773-e70a-444e-b53a-639ec87ca0c9-00-2omyig557gis6.spock.replit.dev"
     : "";
 
 export const useAuthStore = create((set, get) => ({
@@ -20,11 +20,8 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-      console.log("authuser chdck auth ", res.data);
-      set({ authUser: res.data });
 
-      const { authUser } = get();
-      console.log("authU ", authUser.User._id);
+      set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth:", error);
@@ -78,9 +75,7 @@ export const useAuthStore = create((set, get) => ({
   updateProfile: async (data) => {
     set({ isUpdatingProfile: true });
     try {
-      console.log("res ", data);
       const res = await axiosInstance.put("/auth/update-profile", data);
-      console.log("res in updateProfile", res);
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -94,24 +89,16 @@ export const useAuthStore = create((set, get) => ({
   connectSocket: () => {
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
-    // console.log("authuser ", authUser.User?._id);
 
     const socket = io(BASE_URL, {
       query: {
-        userId: authUser.User?._id || authUser._id,
+        userId: authUser._id,
       },
-      transports: ["websocket"], // Enforce WebSocket
-      reconnection: true, // Allow reconnection
-      reconnectionAttempts: 5, // Maximum attempts
-      reconnectionDelay: 1000, // Delay between attempts
     });
     socket.connect();
-    // console.log("socket connected", socket.connected);
 
     set({ socket: socket });
-    socket.on("connect", () => {
-      console.log("Socket connected", socket.id);
-    });
+
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
     });

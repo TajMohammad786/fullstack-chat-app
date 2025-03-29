@@ -10,25 +10,17 @@ const Sidebar = () => {
 
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-  const [filteredUsers, setFilteredUsers] = useState([]); // Add state for filteredUsers
-  // console.log("onlineUsers", onlineUsers);
+
   useEffect(() => {
+    console.log("hello");
     getUsers();
   }, [getUsers]);
 
-  useEffect(() => {
-    if (users.users) {
-      // Check if users.users is defined
-      setFilteredUsers(
-        showOnlineOnly
-          ? users.users.filter((user) => onlineUsers.includes(user._id))
-          : users.users,
-      );
-    }
-    console.log("Online users " + onlineUsers);
-  }, [users.users, showOnlineOnly, onlineUsers]); // Add dependencies
+  const filteredUsers = showOnlineOnly
+    ? users.users.filter((user) => onlineUsers.includes(user._id))
+    : users.users;
 
-  // console.log("filteredUsers ", filteredUsers);
+  console.log("filteredUsers ", filteredUsers);
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
@@ -60,10 +52,7 @@ const Sidebar = () => {
         {filteredUsers.map((user) => (
           <button
             key={user._id}
-            onClick={() => {
-              setSelectedUser(user);
-              // console.log("selectedUser ", selectedUser._id);
-            }}
+            onClick={() => setSelectedUser(user)}
             className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
@@ -86,7 +75,7 @@ const Sidebar = () => {
 
             {/* User info - only visible on larger screens */}
             <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{user.username}</div>
+              <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
                 {onlineUsers.includes(user._id) ? "Online" : "Offline"}
               </div>
